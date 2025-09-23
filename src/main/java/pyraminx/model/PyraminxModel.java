@@ -1,4 +1,4 @@
-package Model;
+package pyraminx.model;
 
 public class PyraminxModel {
     private final int[] state;

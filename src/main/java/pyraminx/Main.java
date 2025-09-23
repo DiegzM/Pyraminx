@@ -1,3 +1,5 @@
+package pyraminx;
+
 public class Main {
     /*
       MVC
