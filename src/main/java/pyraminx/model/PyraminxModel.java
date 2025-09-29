@@ -1,20 +1,28 @@
 package pyraminx.model;
 
+/**
+ *
+ *
+ *
+ */
 public class PyraminxModel {
-    private final int[] state;
-    private final int stickersPerFace;
+    private Piece[] pieces;
+    private int[] orientaions;
 
-    public PyraminxModel(int layers) {
-        stickersPerFace = (int)Math.pow(layers, 2);
-        state = new int[(int)(stickersPerFace * 4)];
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < (int)Math.pow(layers, 2); j++) {
-                state[(this.stickersPerFace * i) + j] = i;
-            }
-        }
+    public PyraminxModel() {
+        pieces = new Piece[14];
     }
 
-    public int[] getState() {
-        return state;
+    private void initializePieces() {
+        // Tip Pieces
+        pieces[0] = new TipPiece(0, new PColor[]{PColor.RED,  PColor.BLUE, PColor.YELLOW}); // TOP TIP
+        pieces[1] = new TipPiece(1,  new PColor[]{PColor.RED, PColor.YELLOW, PColor.GREEN}); // FRONT LEFT TIP
+        pieces[2] = new TipPiece(2,  new PColor[]{PColor.RED, PColor.GREEN, PColor.BLUE}); // FRONT RIGHT TIP
+        pieces[3] = new TipPiece(3,  new PColor[]{PColor.GREEN, PColor.YELLOW, PColor.BLUE}); // BACK TIP
+
+        // Edge Pieces
+        // Center Pieces
+
     }
 }
+
