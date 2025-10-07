@@ -1,8 +1,13 @@
 package pyraminx.model;
 
-public class CenterPiece extends Piece {
-    public CenterPiece(int id, PColor[] stickers) {
-        super(id, PieceType.CENTER, stickers);
+/**
+ * Tip class representing a tip piece of the Pyraminx puzzle.
+ * @param id Unique identifier for the tip piece.
+ * @param stickers Array of three PColor enums representing the colors on the tip piece.
+ */
+public class Tip extends Piece {
+    public Tip(int id, PColor[] stickers) {
+        super(id, PieceType.TIP, stickers);
 
         if (stickers.length != 3) {
             throw new IllegalArgumentException("Stickers must be of length 3");

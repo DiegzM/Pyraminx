@@ -1,0 +1,9 @@
+Rubik's/Pyraminx MVP
+[ ] Correct state representation (all stickers tracked)
+[ ] Standard move notation (R, U, F, L, D, B with ', 2)
+[ ] Scramble function (random valid moves)
+[ ] Undo/redo move history
+[ ] 2D net visualization (updates with moves)
+[ ] Move history display
+[ ] Save/load puzzle state
+[ ] Reset to solved
