@@ -8,7 +8,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.PointLight;
 import javafx.scene.AmbientLight;
 import javafx.scene.transform.Rotate;
-import javafx.animation.RotateTransition;
+import javafx.util.Duration;
+import javafx.animation.Animation;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+
+import pyraminx.view.Pyraminx3D;
 
 /**
  * Class representing the 3D environment of the Pyraminx.
@@ -32,17 +38,7 @@ public class PyraminxWorld extends Group {
     }
 
     public void initModel() {
-        // test tip3d
-        Tip3D tip = new Tip3D(new Color[]{Color.RED, Color.GREEN, Color.BLUE});
-        this.getChildren().add(tip);
-
-        // animate tip rotation testing
-        RotateTransition rotateTransition = new RotateTransition(javafx.util.Duration.seconds(5), tip);
-        rotateTransition.setAxis(Rotate.Y_AXIS);
-        rotateTransition.setByAngle(360);
-        rotateTransition.setCycleCount(RotateTransition.INDEFINITE);
-        rotateTransition.setAutoReverse(false);
-        rotateTransition.play();
+        Group pyraminx = new Pyraminx3D(20f, 2f, 0.5f);
+        this.getChildren().add(pyraminx);
     }
-
 }

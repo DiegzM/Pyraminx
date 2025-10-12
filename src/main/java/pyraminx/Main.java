@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.scene.paint.Color;
+import javafx.scene.SceneAntialiasing;
 
 import pyraminx.model.PyraminxModel;
 import pyraminx.controller.PyraminxController;
@@ -37,7 +38,8 @@ public class Main extends Application {
         root.setRight(settingsView.getRoot());
 
         // Create the scene
-        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT, Color.BLACK);
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT, true, SceneAntialiasing.BALANCED);
+        scene.setFill(Color.BLACK);
         stage.setScene(scene);
         stage.setTitle("Pyraminx");
         stage.show();

@@ -1,6 +1,7 @@
 package pyraminx.view;
 
 // Imports
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Polygon;
@@ -8,30 +9,28 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
+import javafx.util.Duration;
 import javafx.scene.shape.Box;
+import javafx.scene.shape.CullFace;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.RotateTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.Timeline;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point3D;
 
 /**
  * Class representing a 3D tip piece of the Pyraminx puzzle.
  */
 
 public class Tip3D extends Piece3D {
-    // Fields
-    private MeshView mesh;
-    private Color borderColor = Color.WHITE; // Default border color
 
     // Constructor
-    public Tip3D(Color[] colors) {
-        super(colors);
+    public Tip3D(double[] position, float side, float inset, float outwardOffset, Color[] colors, Color borderColor) {
+        super(position, side, inset, outwardOffset, colors, borderColor);
         createShape();
-    }
-    
-    // Override the abstract move method
-    @Override
-    public void move(double x, double y, double z) {
-        // Move the piece by updating its translation properties
-        this.setTranslateX(this.getTranslateX() + x);
-        this.setTranslateY(this.getTranslateY() + y);
-        this.setTranslateZ(this.getTranslateZ() + z);
     }
 
     // Override the abstract rotate method
@@ -42,24 +41,27 @@ public class Tip3D extends Piece3D {
     
     // Create the pyramid shape with triangular faces and black borders
     @Override
-    public void createShape() {
-        // HARDCODE (temporary): create a piece size 20 and inset 2
-        float side = 20f;
+    protected void createShape() {
         float h = (float) (side * Math.sqrt(6f) / 3f); // height of tetrahedron
         float r = (float) (side * Math.sqrt(3f) / 3f); // radius of circumscribed circle of base
+
+        // Set height field
+        this.height = h;
         
         // Create the tetrahedron mesh
         TriangleMesh triangleMesh = new TriangleMesh();
-
+        
         // Create the points (vertices) of the pyramid
         float[] pts = new float[] {
-            0,  -h,  0,                                         // apex
-            0,  0,  r,                                         // base 1 (back)
-            (float)(r * -Math.sqrt(3f) / 2f), 0, (-r/2),   // base 2 (front left)
-            (float)(r * Math.sqrt(3f) / 2f), 0, (-r/2)     // base 3 (front right)
+            0,  -h/2,  0,                                         // apex at origin
+            0,  h/2,  r,                                         // base 1 (back)
+            (float)(-Math.sqrt(3f) / 2f * r), h/2, (-r/2),       // base 2 (front left)
+            (float)(Math.sqrt(3f) / 2f * r), h/2, (-r/2)        // base 3 (front right)
         };
 
-        // Add points (vertices) to the mesh
+
+        // Compute centroid of points
+
         triangleMesh.getPoints().addAll(pts);
 
         // Define texture coordinates (dummy values)
@@ -67,36 +69,58 @@ public class Tip3D extends Piece3D {
 
         // Define the faces of the pyramid (triangles)
         triangleMesh.getFaces().addAll(
-            0, 0, 2, 0, 1, 0, // Face 1 (apex, base vertex 2, base vertex 1)
-            0, 0, 1, 0, 3, 0, // Face 2 (apex, base vertex 1, base vertex 3)
-            0, 0, 3, 0, 2, 0, // Face 3 (apex, base vertex 3, base vertex 2)
-            1, 0, 2, 0, 3, 0 // Base face (base vertex 1, base vertex 2, base vertex 3)
+            0, 0, 1, 0, 2, 0, // Face 1: Left
+            0, 0, 3, 0, 1, 0, // Face 2: Front
+            0, 0, 2, 0, 3, 0, // Face 3: Right
+            1, 0, 3, 0, 2, 0  // Face 4: Base
         );
 
         // Add black base color to the whole mesh
         PhongMaterial baseMaterial = new PhongMaterial();
         baseMaterial.setDiffuseColor(borderColor);
         
+        
         // Create meshview and add to group
-        float centroidOffset = h / 4f;
-
         this.mesh = new MeshView(triangleMesh);
         this.mesh.setMaterial(baseMaterial);
 
-        Sphere pivot = new Sphere(2);
-        pivot.setMaterial(new PhongMaterial(Color.YELLOW));
-        pivot.setTranslateY(-30);
-        pivot.setTranslateX(0);
-        pivot.setTranslateZ(0);
+        this.getChildren().add(this.mesh);
 
-        // add box 20 size to test
-        Box box = new Box(20, 20, 20);
-        box.setMaterial(new PhongMaterial(Color.PURPLE));
-        box.setTranslateY(0);
-        box.setTranslateX(0);
-        box.setTranslateZ(0);
+        //Create sticker faces
+        createFaces(inset);
+    }
 
-        this.getChildren().addAll(box, pivot);
+    // Create sticker faces
+    @Override
+    protected void createFaces(float inset) {
+        if (this.mesh == null) return;
+
+        // Get the faces of this.mesh
+        TriangleMesh mesh = (TriangleMesh) this.mesh.getMesh();
+
+        // Loop through each point of the mesh and create inset faces
+        for (int face = 0; face < mesh.getFaces().size() / 6; face++) {
+            // Get original points from mesh by face
+            Point3D[] originalPts = extractFacePoints(mesh, face);
+
+            // Inset the face points
+            Point3D[] insetPts = insetFacePoints(originalPts, inset, outwardOffset);
+
+            // Get color
+            Color stickerColor;
+
+            switch (face) {
+                case 0 -> stickerColor = colors[0]; // Left
+                case 1 -> stickerColor = colors[2]; // Front
+                case 2 -> stickerColor = colors[1]; // Right
+                case 3 -> stickerColor = colors[3]; // Back 
+                default -> stickerColor = borderColor; // Top and Bottom
+            };
+            // Build and add the sticker
+            MeshView sticker = createStickerFace(insetPts, stickerColor);
+            this.getChildren().add(sticker);
+        }
+
     }
 
 }

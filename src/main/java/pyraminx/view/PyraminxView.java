@@ -23,7 +23,7 @@ public class PyraminxView extends Group {
     
     // Fields
     private static final int CAMERA_DISTANCE = 200;
-    private static final Color BACKGROUND_COLOR = Color.web("#030303");
+    private static final Color BACKGROUND_COLOR = Color.web("#090909");
     private static final double ROTATE_CAMERA_SPEED = 0.5;
     private static final double ROTATE_CAMERA_DAMPING = 0.85;
 
