@@ -11,6 +11,9 @@ public abstract class Piece {
     protected int id;
     protected PieceType type;
     protected PColor[] stickers;
+    protected int orientation;
+
+
 
     // Constructor
     public Piece(int id, PieceType type, PColor[] stickers) {
@@ -36,6 +39,25 @@ public abstract class Piece {
 
     // Get the sticker colors of the piece given an orientation
     public abstract PColor[] getVisibleColors(int orientation);
+
+    // Get the current orientation of the piece
+    public int getOrientation() {
+        return orientation;
+    }
+
+    // Set the orientation of the piece
+    public void setOrientation(int orientation) {
+        this.orientation = orientation % stickers.length;
+        if (this.orientation < 0) this.orientation += stickers.length;
+    }
+
+    // Rotates the piece
+    public void rotateLocal(int steps) {
+        setOrientation(this.orientation + steps);
+    }
+
+    // Returns current orientation
+    public PColor[] getVisibleColors() { return getVisibleColors(this.orientation); }
 
     // Print the information about the piece
     @Override
